@@ -12,7 +12,7 @@ Tested on Python 3.11, PyTorch 2.5, CUDA 12.1, A40 / L40S GPUs.
 Managed with [uv](https://docs.astral.sh/uv/).
 
 ```bash
-git clone <repo-url> && cd EgoWAM
+git clone https://github.com/GaTech-RL2/EgoWAM.git && cd EgoWAM
 uv venv emimic --python 3.11
 source emimic/bin/activate
 uv pip install -r requirements.txt

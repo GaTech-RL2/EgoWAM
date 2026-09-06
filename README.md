@@ -71,7 +71,7 @@ All variants share the trunk and the flow-matching action head, and differ only 
 ## ⚡ Quickstart
 
 ```bash
-git clone <repo-url> && cd EgoWAM
+git clone https://github.com/GaTech-RL2/EgoWAM.git && cd EgoWAM
 uv venv emimic --python 3.11 && source emimic/bin/activate
 uv pip install -r requirements.txt
 uv pip install -e .
