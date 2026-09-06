@@ -1,0 +1,47 @@
+# RoboTwin aloha-agilex SINGLE-embodiment local zarr data module (shared by VAE/RAE/HPT).
+# folder_path is the per-task/variant knob (override on CLI or clone per task).
+# use_future: true serves the future_ee_pose (+ future image) heads. LocalEpisodeResolver
+# loads every episode*.zarr in folder_path; 80/20 train/valid split via `mode`. No S3 filters.
+_target_: egowam.pl_utils.pl_data_utils.MultiDataModuleWrapper
+
+train_datasets:
+  robotwin_aloha_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.robotwin_root}/zarrDataset/pick_diverse_bottles/aloha-agilex_clean_50
+      key_map:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinAloha.get_keymap
+        action_horizon: 45
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinAloha.get_transform_list
+        chunk_length: 100
+        use_future: true
+    mode: train
+
+valid_datasets:
+  robotwin_aloha_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.robotwin_root}/zarrDataset/pick_diverse_bottles/aloha-agilex_clean_50
+      key_map:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinAloha.get_keymap
+        action_horizon: 45
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinAloha.get_transform_list
+        chunk_length: 100
+        use_future: true
+    mode: valid
+
+train_dataloader_params:
+  robotwin_aloha_bimanual:
+    batch_size: 32
+    num_workers: 10
+
+valid_dataloader_params:
+  robotwin_aloha_bimanual:
+    batch_size: 32
+    num_workers: 10

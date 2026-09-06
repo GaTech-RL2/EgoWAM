@@ -1,0 +1,120 @@
+_target_: egowam.pl_utils.pl_data_utils.MultiDataModuleWrapper
+
+train_datasets:
+  eva_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/eva_bag_groceries
+      flow_root: ${paths.data_root}/eva_bag_groceries_3d_flow_track4world
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.data_root}/eva_bag_groceries_3d_flow_track4world
+        point_flow_movement_threshold_3d: 0.002  # meters (EVA world-frame)
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+    filters:
+      task: "EgoWAM_bag_groceries"
+      scene: "white_wall"
+      robot_name: "eva_bimanual"
+    mode: train
+
+  aria_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/aria_bag_groceries_everse
+      flow_root: ${paths.data_root}/aria_bag_groceries_everse_3d_flow_track4world
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+        action_horizon: 30
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.data_root}/aria_bag_groceries_everse_3d_flow_track4world
+        point_flow_head_skip_frames: 20
+        point_flow_tail_skip_frames: 20
+        point_flow_movement_threshold_3d: 0.010  # meters (Aria world-frame includes head motion)
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+    filters:
+      task: "bag_groceries"
+      robot_name: "aria_bimanual"
+    mode: train
+
+valid_datasets:
+  eva_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/eva_bag_groceries
+      flow_root: ${paths.data_root}/eva_bag_groceries_3d_flow_track4world
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.data_root}/eva_bag_groceries_3d_flow_track4world
+        point_flow_movement_threshold_3d: 0.002
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+    filters:
+      task: "EgoWAM_bag_groceries"
+      scene: "white_wall"
+      robot_name: "eva_bimanual"
+    mode: valid
+
+  aria_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/aria_bag_groceries_everse
+      flow_root: ${paths.data_root}/aria_bag_groceries_everse_3d_flow_track4world
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+        action_horizon: 30
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.data_root}/aria_bag_groceries_everse_3d_flow_track4world
+        point_flow_head_skip_frames: 20
+        point_flow_tail_skip_frames: 20
+        point_flow_movement_threshold_3d: 0.010
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+    filters:
+      task: "bag_groceries"
+      robot_name: "aria_bimanual"
+    mode: valid
+
+train_dataloader_params:
+  eva_bimanual:
+    batch_size: 32
+    num_workers: 10
+  aria_bimanual:
+    batch_size: 32
+    num_workers: 10
+valid_dataloader_params:
+  eva_bimanual:
+    batch_size: 32
+    num_workers: 10
+  aria_bimanual:
+    batch_size: 32
+    num_workers: 10

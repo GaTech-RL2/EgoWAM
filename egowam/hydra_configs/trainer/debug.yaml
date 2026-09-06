@@ -1,0 +1,14 @@
+defaults:
+  - ddp
+
+# Inherit `strategy: ddp` from the ddp default (we explicitly switched away
+# from `ddp_find_unused_parameters_true` because Lightning emitted "did not
+# find any unused parameters in the forward pass... results in an extra
+# traversal of the autograd graph every iteration"). Override here only if
+# a future debug-only config legitimately needs find_unused_parameters.
+limit_train_batches: 5 #5
+limit_val_batches: 3 #3
+check_val_every_n_epoch: 2
+profiler: simple
+max_epochs: 4 #50
+min_epochs: 4 #50

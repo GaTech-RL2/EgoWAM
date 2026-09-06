@@ -1,0 +1,16 @@
+# EgoWAM (EgoVerse hpt_wm world-model) deploy config.
+# Basic experiment keys (kept unchanged; filled by eval.sh --overrides):
+policy_name: EgoWAM
+task_name: null
+task_config: null
+ckpt_setting: null
+seed: null
+instruction_type: unseen
+
+# EgoWAM-specific (overridable via eval.sh / run_sim_eval.py):
+ckpt_path: null          # REQUIRED: path to an hpt_wm last.ckpt (single-arx or cross shared-head)
+robot: aloha-agilex      # rollout embodiment (native bimanual; common to all 3 task robot-sets)
+num_inference_steps: 10  # diffusion denoise steps for closed-loop control (speed vs quality)
+action_horizon: 45       # predicted chunk length used by the action heads
+chunk_length: 100        # transform-list chunk length (matches training)
+exec_horizon: 30         # waypoints executed per replan (receding horizon)

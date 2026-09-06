@@ -1,0 +1,14 @@
+/.cuda-name
+/build
+
+**/__pycache__/**
+.vscode
+.cursor
+LIBERO-Cosmos-Policy
+ALOHA-Cosmos-Policy
+rollouts/*
+tmp/*
+logs/*
+**/logs/*
+sbatch_logs/*
+visualizations/*

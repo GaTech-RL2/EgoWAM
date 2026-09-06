@@ -1,0 +1,100 @@
+# Single WM training entrypoint. The world target is chosen with model=, and the flow
+# keys the schematic declares with flow3d= (none | point3d):
+#
+#   Pixel / DINO              model=<...>                         (flow3d=none, the default)
+#   3D Flow, co-train         model=hpt_wm_cotrain_3dflow flow3d=point3d
+#   3D Flow, robot-only       model=hpt_wm_eva_3dflow              flow3d=point3d
+#
+defaults:
+  - model: hpt_wm_eva
+  - paths: default
+  - trainer: ddp
+  - debug: null
+  - logger: wandb
+  - data: debug
+  - callbacks: checkpoints
+  - _self_
+  - flow3d: none
+  - override hydra/launcher: submitit
+
+name: test_wm
+description: test_wm
+ckpt_path: null
+train: true
+eval: false
+validate: false
+
+eval_class:
+  _target_: egowam.scripts.evaluation.Eve
+  mode: real
+  arm: both
+  eval_path: "./logs/eval/${name}_${now:%Y-%m-%d_%H-%M-%S}"
+
+hydra:
+  run:
+    dir: ./logs/${name}/${description}_${now:%Y-%m-%d_%H-%M-%S}
+  sweep:
+    dir: ./logs/${name}/${description}_${now:%Y-%m-%d_%H-%M-%S}
+
+launch_params:
+  gpus_per_node: 1
+  nodes: 1
+
+data_schematic:
+  _target_: egowam.rldb.zarr.utils.DataSchematic
+  norm_mode: quantile
+  schematic_dict:
+    eva_bimanual:
+      front_img_1:
+        key_type: camera_keys
+        zarr_key: observations.images.front_img_1
+      right_wrist_img:
+        key_type: camera_keys
+        zarr_key: observations.images.right_wrist_img
+      left_wrist_img:
+        key_type: camera_keys
+        zarr_key: observations.images.left_wrist_img
+      future_front_img_1:
+        key_type: camera_keys
+        zarr_key: future.observations.images.front_img_1
+      ee_pose:
+        key_type: proprio_keys
+        zarr_key: observations.state.ee_pose
+      future_ee_pose:
+        key_type: proprio_keys
+        zarr_key: future.observations.state.ee_pose
+      actions_cartesian:
+        key_type: action_keys
+        zarr_key: actions_cartesian
+      embodiment:
+        key_type: metadata_keys
+        zarr_key: metadata.embodiment
+    
+    aria_bimanual:
+      front_img_1:
+        key_type: camera_keys
+        zarr_key: observations.images.front_img_1
+      future_front_img_1:
+        key_type: camera_keys
+        zarr_key: future.observations.images.front_img_1
+      ee_pose:
+        key_type: proprio_keys
+        zarr_key: observations.state.ee_pose
+      future_ee_pose:
+        key_type: proprio_keys
+        zarr_key: future.observations.state.ee_pose
+      actions_cartesian:
+        key_type: action_keys
+        zarr_key: actions_cartesian
+      embodiment:
+        key_type: metadata_keys
+        zarr_key: metadata.embodiment
+  
+  viz_img_key:
+    eva_bimanual:
+      front_img_1
+    aria_bimanual:
+      front_img_1
+
+seed: 42
+norm_stat_fraction: 1.0 # fraction of dataset to calculate norm stats over (out of 1.0)

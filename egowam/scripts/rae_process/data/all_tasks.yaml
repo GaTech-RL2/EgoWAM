@@ -1,0 +1,212 @@
+# Stage-1 (RAE decoder) training data: ALL THREE TASKS x three sources.
+#
+#   <task>__eva            robot demonstrations
+#   <task>__aria_everse    EgoVerse human split (the ~10:1 pool)
+#   <task>__aria_indomain  in-domain human, same scene and objects as the robot
+#
+# Generated from hydra_configs/data/{cup_saucer,fold_clothes,bag_grocery}/{everseA,indomain}.yaml,
+# so folders and SQL filters match the flagship splits. Paths use oc.env because the RAE
+# script loads this with OmegaConf outside Hydra (see README).
+#
+# One exception: cup_saucer/indomain.yaml still names aria_cup_saucer_static_cam, a folder
+# left from the pre-rename filter. The EgoWAM_cup_on_saucer aria episodes are in
+# aria_cup_saucer, so that is what is used here.
+#
+# Nine datasets, concatenated by rae_stage1_data. The decoder sees only images, so mixing
+# tasks and embodiments widens appearance coverage without touching actions.
+pixel_key: observations.images.front_img_1
+future_pixel_key: future.observations.images.front_img_1
+train_datasets:
+  cup_on_saucer__eva:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/eva_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+    filters:
+      task: EgoWAM_cup_on_saucer
+      scene: white_wall
+      robot_name: eva_bimanual
+  cup_on_saucer__aria_everse:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_cup_saucer_everse
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+    filters:
+      task: cup_on_saucer
+      robot_name: aria_bimanual
+  cup_on_saucer__aria_indomain:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+    filters:
+      task: EgoWAM_cup_on_saucer
+      scene: white_wall
+      robot_name: aria_bimanual
+  fold_clothes__eva:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/eva_fold_clothes
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+    filters:
+      task: EgoWAM_fold_clothes
+      scene: white_wall
+      robot_name: eva_bimanual
+  fold_clothes__aria_everse:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_fold_clothes_everse
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+    filters:
+      task: fold_clothes
+      robot_name: aria_bimanual
+  fold_clothes__aria_indomain:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_fold_clothes
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+    filters:
+      task: EgoWAM_fold_clothes
+      scene: white_wall
+      robot_name: aria_bimanual
+  bag_groceries__eva:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/eva_bag_groceries
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+    filters:
+      task: EgoWAM_bag_groceries
+      scene: white_wall
+      robot_name: eva_bimanual
+  bag_groceries__aria_everse:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_bag_groceries_everse
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+    filters:
+      task: bag_groceries
+      robot_name: aria_bimanual
+  bag_groceries__aria_indomain:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_bag_groceries
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+    filters:
+      task: EgoWAM_bag_groceries
+      scene: white_wall
+      robot_name: aria_bimanual
+valid_datasets:
+  cup_on_saucer__eva:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/eva_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+    filters:
+      task: EgoWAM_cup_on_saucer
+      scene: white_wall
+      robot_name: eva_bimanual
+  cup_on_saucer__aria_everse:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_cup_saucer_everse
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+    filters:
+      task: cup_on_saucer
+      robot_name: aria_bimanual
+  cup_on_saucer__aria_indomain:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+    filters:
+      task: EgoWAM_cup_on_saucer
+      scene: white_wall
+      robot_name: aria_bimanual
+  fold_clothes__eva:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/eva_fold_clothes
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+    filters:
+      task: EgoWAM_fold_clothes
+      scene: white_wall
+      robot_name: eva_bimanual
+  fold_clothes__aria_everse:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_fold_clothes_everse
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+    filters:
+      task: fold_clothes
+      robot_name: aria_bimanual
+  fold_clothes__aria_indomain:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_fold_clothes
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+    filters:
+      task: EgoWAM_fold_clothes
+      scene: white_wall
+      robot_name: aria_bimanual
+  bag_groceries__eva:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/eva_bag_groceries
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+    filters:
+      task: EgoWAM_bag_groceries
+      scene: white_wall
+      robot_name: eva_bimanual
+  bag_groceries__aria_everse:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_bag_groceries_everse
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+    filters:
+      task: bag_groceries
+      robot_name: aria_bimanual
+  bag_groceries__aria_indomain:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_bag_groceries
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+    filters:
+      task: EgoWAM_bag_groceries
+      scene: white_wall
+      robot_name: aria_bimanual

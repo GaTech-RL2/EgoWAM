@@ -1,0 +1,220 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cosmos-policy"
+version = "0.1.0"
+authors = [
+  {name = "NVIDIA Corporation"},
+]
+description = "Cosmos Policy: Fine-Tuning Video Models for Visuomotor Control and Planning"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: GPU :: NVIDIA CUDA",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  # Core Cosmos dependencies
+  "cosmos-predict2>=0.1.0",
+
+  # Core Python libraries
+  "attrs>=25.0.0",
+  "numpy>=1.26.0",
+  "pillow>=11.0.0",
+
+  # Deep learning frameworks
+  "torch>=2.6.0",
+  "torchvision>=0.20.0",
+  "einops>=0.8.0",
+
+  # Data processing and I/O
+  "h5py>=3.0.0",
+  "imageio[pyav,ffmpeg]>=2.30.0",
+  "opencv-contrib-python>=4.10.0",
+  "av>=16.0.0",
+  "cloudpickle>=3.0.0",
+
+  # Configuration and utilities
+  "omegaconf>=2.3.0",
+  "hydra-core>=1.3.2",
+  "draccus>=0.11.0",
+  "loguru>=0.7.2",
+  "tqdm>=4.66.0",
+  "pyyaml>=6.0.0",
+
+  # Experiment tracking
+  "wandb>=0.22.0",
+
+  # Robot simulation environments
+  "robosuite>=1.5.0",
+  "gymnasium>=1.2.0",
+  "mujoco>=3.2.0",
+
+  # API server dependencies (for deployment)
+  "fastapi>=0.120.0",
+  "uvicorn>=0.30.0",
+  "json-numpy>=2.0.0",
+
+  # Text embeddings
+  "transformers==4.51.3",
+  "sentencepiece>=0.2.0",
+]
+
+[project.optional-dependencies]
+# Development dependencies
+dev = [
+  "pytest>=8.4.2",
+  "ruff==0.12.7",
+  "pyrefly==0.39.2",
+  "pre-commit>=3.7.1",
+]
+
+# GPU-specific dependencies matching CUDA 12.8 / PyTorch 2.7
+cu128 = [
+  "cosmos-predict2[cu128]",
+  "flash-attn==2.7.3",
+  "transformer-engine==2.2.0",
+  "natten==0.21.0",
+  "xformers",
+]
+
+# GPU-specific dependencies matching CUDA 13.0 / PyTorch 2.9
+cu130 = [
+  "cosmos-predict2[cu130]",
+  "flash-attn==2.7.4.post1",
+  "transformer-engine==2.8.0",
+  "natten==0.21.0",
+  "xformers",
+]
+
+# Full installation including all robot environments
+# Note: This requires manual installation of robosuite, robocasa, and libero
+# as they are included as git submodules
+full = [
+  "cosmos-policy[dev]",
+]
+
+[project.urls]
+homepage = "https://research.nvidia.com/labs/dir/cosmos-policy"
+documentation = "https://github.com/nvidia-cosmos/cosmos-policy/blob/main/README.md"
+repository = "https://github.com/nvidia-cosmos/cosmos-policy"
+issues = "https://github.com/nvidia-cosmos/cosmos-policy/issues"
+
+[tool.uv]
+conflicts = [
+  [{extra = "cu128"}, {extra = "cu130"}],
+]
+
+[tool.hatch.build.targets.sdist]
+packages = [
+  "config",
+  "datasets",
+  "experiments",
+  "models",
+  "modules",
+  "scripts",
+  "tokenizers",
+  "utils",
+]
+exclude = [
+  "__pycache__",
+  "*.pyc",
+  "*_test.py",
+  "internal_*",
+  "logs/",
+  "rollouts/",
+  "sbatch_logs/",
+  "LIBERO/",
+  "robocasa/",
+  "robosuite/",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = [
+  "config",
+  "datasets",
+  "experiments",
+  "models",
+  "modules",
+  "scripts",
+  "tokenizers",
+  "utils",
+]
+exclude = [
+  "__pycache__",
+  "*.pyc",
+  "*_test.py",
+  "internal_*",
+  "logs/",
+  "rollouts/",
+  "sbatch_logs/",
+  "LIBERO/",
+  "robocasa/",
+  "robosuite/",
+]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::FutureWarning",
+]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+  "E",  # pycodestyle errors
+  "F",  # pyflakes
+  "I",  # isort
+  "W",  # pycodestyle warnings
+]
+ignore = [
+  "E501",  # line too long (handled by formatter)
+  "E741",  # ambiguous variable name
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["cosmos_policy"]
+
+[tool.coverage.run]
+parallel = true
+concurrency = ["thread", "multiprocessing"]
+source = ["config", "datasets", "experiments", "models", "modules", "scripts", "tokenizers", "utils"]
+sigterm = true
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "@overload",
+]

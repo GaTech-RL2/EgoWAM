@@ -1,0 +1,48 @@
+# # path to root directory
+# # this requires PROJECT_ROOT environment variable to exist
+# # you can replace it with "." if you want the root to be the current working directory
+# root_dir: ${oc.env:PROJECT_ROOT}
+
+# # path to data directory
+# data_dir: ${paths.root_dir}/data/
+
+# path to logging directory
+log_dir: ${paths.root_dir}/logs/
+
+# path to output directory, created dynamically by hydra
+# path generation pattern is specified in `configs/hydra/default.yaml`
+# use it to store all files generated during the run, like ckpts and metrics
+output_dir: ${hydra:runtime.output_dir}
+
+# path to working directory
+work_dir: ${hydra:runtime.cwd}
+
+# Shared on-disk cache for artifacts that are stable across runs (e.g. flow
+# normalization stats keyed by an episode/config manifest). Must live outside
+# the per-run output_dir so reuse actually works. Override with the
+# FLOW_STATS_CACHE_DIR env var if you want to pin it elsewhere.
+flow_stats_cache_dir: ${oc.env:FLOW_STATS_CACHE_DIR,${paths.work_dir}/.cache/flow_stats}
+# ---------------------------------------------------------------------------------------------
+# External data and asset roots. Every dataset and checkpoint path in this repo resolves through
+# one of these, so a new machine is configured by setting environment variables rather than by
+# editing configs. Defaults are the GT cluster locations the paper's runs used.
+# ---------------------------------------------------------------------------------------------
+
+# Converted zarr datasets: <data_root>/<dataset_name>, e.g. eva_cup_saucer, aria_cup_saucer.
+data_root: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}
+
+# Track4World 3D point-flow sidecars, written by egowam/scripts/3dflow_process/. Same layout as data_root, with
+# each dataset suffixed _3d_flow_track4world.
+flow_root: ${oc.env:EGOWAM_FLOW_ROOT,${paths.data_root}}
+
+# Trained run directories (checkpoints/, .hydra/, trainHydra.log).
+ckpt_root: ${oc.env:EGOWAM_CKPT_ROOT,/coc/cedarp-dxu345-0/bli678/results/EgoWAM}
+
+# RAE (Representation Autoencoder) assets for the DINO world-model target: the stage-1/stage-2
+# checkout and its trained encoder checkpoint.
+# NOT PUBLISHABLE FROM THIS REPO -- an external user must obtain these separately.
+rae_root: ${oc.env:EGOWAM_RAE_ROOT,/coc/flash7/mlin365/EgoVerse-main/external/RAE}
+rae_ckpt_root: ${oc.env:EGOWAM_RAE_CKPT_ROOT,/coc/flash7/mlin365/RAE/ckpts}
+
+# RoboTwin simulation scratch: converted datasets, run outputs, eval artifacts.
+robotwin_root: ${oc.env:EGOWAM_ROBOTWIN_ROOT,/coc/flash7/scratch/egowm/robotwin}

@@ -1,0 +1,9 @@
+# @package data_schematic.schematic_dict
+#
+# Flow-target keys for the WM data schematic. Selected by `flow3d=` on the CLI so that a
+# single train_zarr_wm entrypoint covers every world target; the keys cannot simply be
+# declared unconditionally because a flow key on a dataset with no point_flow_root
+# raises KeyError (zarr_dataset_multi.py:1103).
+#
+# No flow keys at all.
+{}

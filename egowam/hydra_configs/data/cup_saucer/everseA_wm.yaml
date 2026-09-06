@@ -1,0 +1,80 @@
+_target_: egowam.pl_utils.pl_data_utils.MultiDataModuleWrapper
+
+train_datasets:
+  eva_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.data_root}/eva_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+        action_horizon: 45
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+        chunk_length: 100
+        use_future: true
+    mode: train
+
+  aria_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.data_root}/aria_cup_saucer_everse
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+        action_horizon: 30
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+        chunk_length: 100
+        use_future: true
+    mode: train
+
+
+valid_datasets:
+  eva_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.data_root}/eva_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+        action_horizon: 45
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+        chunk_length: 100
+        use_future: true
+    mode: valid
+  
+  aria_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.data_root}/aria_cup_saucer_everse
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+        action_horizon: 30
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+        chunk_length: 100
+        use_future: true
+    mode: valid
+
+train_dataloader_params:
+  eva_bimanual:
+    batch_size: 32
+    num_workers: 10
+  aria_bimanual:
+    batch_size: 32
+    num_workers: 10
+
+valid_dataloader_params:
+  eva_bimanual:
+    batch_size: 32
+    num_workers: 10
+  aria_bimanual:
+    batch_size: 32
+    num_workers: 10

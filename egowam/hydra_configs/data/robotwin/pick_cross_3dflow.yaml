@@ -1,0 +1,198 @@
+# AUTO-GENERATED — RoboTwin cross-embodiment 3D-flow data (pick: ['aloha', 'arx', 'piper', 'ur5']); flow sidecars parallel to zarr.
+_target_: egowam.pl_utils.pl_data_utils.MultiDataModuleWrapper
+train_datasets:
+  robotwin_aloha_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.robotwin_root}/zarrDataset/pick_diverse_bottles/aloha-agilex_clean_50
+      key_map:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinAloha.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.robotwin_root}_3d_flow_track4world/pick_diverse_bottles/aloha-agilex_clean_50
+        point_flow_movement_threshold_3d: 0.0
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinAloha.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_stats_key_3d: robotwin_aloha_bimanual.future_flow_3d_points
+    mode: train
+  robotwin_arx_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.robotwin_root}/zarrDataset/pick_diverse_bottles/arx-x5_clean_50
+      key_map:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinArx.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.robotwin_root}_3d_flow_track4world/pick_diverse_bottles/arx-x5_clean_50
+        point_flow_movement_threshold_3d: 0.0
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinArx.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_stats_key_3d: robotwin_arx_bimanual.future_flow_3d_points
+    mode: train
+  robotwin_piper_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.robotwin_root}/zarrDataset/pick_diverse_bottles/piper_clean_50
+      key_map:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinPiper.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.robotwin_root}_3d_flow_track4world/pick_diverse_bottles/piper_clean_50
+        point_flow_movement_threshold_3d: 0.0
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinPiper.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_stats_key_3d: robotwin_piper_bimanual.future_flow_3d_points
+    mode: train
+  robotwin_ur5_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.robotwin_root}/zarrDataset/pick_diverse_bottles/ur5_clean_50
+      key_map:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinUr5.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.robotwin_root}_3d_flow_track4world/pick_diverse_bottles/ur5_clean_50
+        point_flow_movement_threshold_3d: 0.0
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinUr5.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_stats_key_3d: robotwin_ur5_bimanual.future_flow_3d_points
+    mode: train
+valid_datasets:
+  robotwin_aloha_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.robotwin_root}/zarrDataset/pick_diverse_bottles/aloha-agilex_clean_50
+      key_map:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinAloha.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.robotwin_root}_3d_flow_track4world/pick_diverse_bottles/aloha-agilex_clean_50
+        point_flow_movement_threshold_3d: 0.0
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinAloha.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_stats_key_3d: robotwin_aloha_bimanual.future_flow_3d_points
+    mode: valid
+  robotwin_arx_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.robotwin_root}/zarrDataset/pick_diverse_bottles/arx-x5_clean_50
+      key_map:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinArx.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.robotwin_root}_3d_flow_track4world/pick_diverse_bottles/arx-x5_clean_50
+        point_flow_movement_threshold_3d: 0.0
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinArx.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_stats_key_3d: robotwin_arx_bimanual.future_flow_3d_points
+    mode: valid
+  robotwin_piper_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.robotwin_root}/zarrDataset/pick_diverse_bottles/piper_clean_50
+      key_map:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinPiper.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.robotwin_root}_3d_flow_track4world/pick_diverse_bottles/piper_clean_50
+        point_flow_movement_threshold_3d: 0.0
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinPiper.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_stats_key_3d: robotwin_piper_bimanual.future_flow_3d_points
+    mode: valid
+  robotwin_ur5_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.robotwin_root}/zarrDataset/pick_diverse_bottles/ur5_clean_50
+      key_map:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinUr5.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.robotwin_root}_3d_flow_track4world/pick_diverse_bottles/ur5_clean_50
+        point_flow_movement_threshold_3d: 0.0
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinUr5.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_stats_key_3d: robotwin_ur5_bimanual.future_flow_3d_points
+    mode: valid
+train_dataloader_params:
+  robotwin_aloha_bimanual:
+    batch_size: 16
+    num_workers: 8
+  robotwin_arx_bimanual:
+    batch_size: 16
+    num_workers: 8
+  robotwin_piper_bimanual:
+    batch_size: 16
+    num_workers: 8
+  robotwin_ur5_bimanual:
+    batch_size: 16
+    num_workers: 8
+valid_dataloader_params:
+  robotwin_aloha_bimanual:
+    batch_size: 16
+    num_workers: 8
+  robotwin_arx_bimanual:
+    batch_size: 16
+    num_workers: 8
+  robotwin_piper_bimanual:
+    batch_size: 16
+    num_workers: 8
+  robotwin_ur5_bimanual:
+    batch_size: 16
+    num_workers: 8

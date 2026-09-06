@@ -1,0 +1,80 @@
+stage_1:
+  target: stage1.RAE
+  params:
+    encoder_cls: 'Dinov2withNorm'
+    encoder_config_path: 'facebook/dinov2-with-registers-base'
+    encoder_input_size: 448
+    encoder_params: {'dinov2_path': 'facebook/dinov2-with-registers-base', 'normalize': True}
+    decoder_config_path: 'configs/decoder/ViTXL'
+    pretrained_decoder_path: 'models/decoders/dinov2/wReg_base/ViTXL_n08_i512/model.pt'
+    noise_tau: 0.
+    reshape_to_2d: True
+    normalization_stat_path: 'models/stats/dinov2/wReg_base/imagenet1k_512/stat.pt'
+
+stage_2:
+  target: stage2.models.DDT.DiTwDDTHead
+  params:
+    input_size: 32
+    patch_size: 1 
+    in_channels: 768
+    hidden_size: [1152, 2048]
+    depth: [28, 2]
+    num_heads: [16, 16]
+    mlp_ratio: 4.0
+    class_dropout_prob: 0.1
+    num_classes: 1000
+    use_qknorm: False
+    use_swiglu: True
+    use_rope: True
+    use_rmsnorm: True
+    wo_shift: False
+    use_pos_embed: True
+  ckpt: 'models/DiTs/Dinov2/wReg_base/ImageNet512/DiTDH-XL_ep400/stage2_model.pt'
+
+
+transport:
+  params:
+    path_type: 'Linear'
+    prediction: 'velocity'
+    time_dist_type: 'uniform'
+
+sampler:
+  mode: ODE
+  params:
+    sampling_method: 'euler'
+    num_steps: 50
+    atol: 1e-6
+    rtol: 1e-3
+    reverse: False
+
+guidance:
+  method: 'autoguidance'
+  scale: 1.5
+  t-min: 0.0
+  t-max: 1.0
+  guidance_model:
+    target: stage2.models.DDT.DiTwDDTHead
+    params:
+      input_size: 32
+      patch_size: 1 
+      in_channels: 768
+      hidden_size: [384, 2048]
+      depth: [12, 2]
+      num_heads: [6, 16]
+      mlp_ratio: 4.0
+      class_dropout_prob: 0.1
+      num_classes: 1000
+      use_qknorm: False
+      use_swiglu: True
+      use_rope: True
+      use_rmsnorm: True
+      wo_shift: False
+      use_pos_embed: True
+    ckpt: 'models/DiTs/Dinov2/wReg_base/ImageNet512/DiTDH-S_ep20/stage2_model.pt'
+
+
+misc:
+  latent_size: [768, 32, 32] # [C, H, W]
+  num_classes: 1000
+  time_dist_shift_dim: 786432 # 32*32*768
+  time_dist_shift_base: 4096

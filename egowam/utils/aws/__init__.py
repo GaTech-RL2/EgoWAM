@@ -1,0 +1,3 @@
+"""
+egowam.utils.aws package
+"""

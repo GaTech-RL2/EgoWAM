@@ -1,0 +1,15 @@
+line-length = 88
+
+exclude = [
+  "external",
+  "egowam/robot/eva/stanford_repo",
+  "*.ipynb",
+  "egowam/robot/oculus_reader",
+  # ROS workspace: must extend sys.path to reach the compiled ARX SDK before importing it.
+  "egowam/robot/eva/eva_ws",
+  "egowam/scripts/3dflow_process"
+]
+
+[lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]

@@ -1,0 +1,222 @@
+_target_: egowam.pl_utils.pl_model.ModelWrapper
+robomimic_model:
+  _target_: egowam.algo.hpt_wm.HPT
+  data_schematic: _${data.dataset.data_schematic}
+  camera_transforms:
+    robotwin_aloha_bimanual:
+      _target_: egowam.utils.egowamUtils.CameraTransforms
+      intrinsics_key: "robotwin"
+      extrinsics_key: "robotwin"
+
+  diffusion: true
+  6dof: true
+
+  ac_keys:
+    robotwin_aloha_bimanual: "actions_cartesian"
+
+  auxiliary_ac_keys:
+    robotwin_aloha_bimanual: ["future_ee_pose", "future_image_latent"]
+  auxiliary_loss_weights:
+    future_ee_pose: 1.0
+    future_image_latent: 1.0
+  future_proprio_key: "future_ee_pose"
+  future_image_keys: ["future_front_img_1"]
+  future_image_latent_key: "future_image_latent"
+  future_image_resize: 128
+  wm_prediction_mode: "joint"
+  teacher_forcing_ratio: 1.0
+  training_stage: 3
+
+  use_shared_vae_stem: false
+  vae_stem_projection: "linear"
+  # RAE (DINOv2-768) world-model encoder instead of the Cosmos VAE.
+  cosmos_vae:
+    _target_: egowam.models.rae_vae.RAEVAEWrapper
+    rae_root: "${paths.rae_root}"
+    config_path: "${paths.rae_root}/configs/stage2/sampling/ImageNet256/DiTDHXL-DINOv2-B.yaml"
+    ckpt_path: "${paths.rae_ckpt_root}/ep-0000002.pt"
+    use_stage2_features: true
+    freeze: true
+
+  trunk:
+    embed_dim: 256
+    num_blocks: 16
+    num_heads: 8
+    token_postprocessing: "joint_token"
+    observation_horizon: 1
+    action_horizon: 64
+    future_horizon: 16
+    no_trunk: false
+    use_domain_embedding: true
+    drop_path: 0.1
+    weight_init_style: "pytorch"
+
+  multitask: false
+  pretrained: false
+  pretrained_checkpoint: ""
+  reverse_kl_samples: 8
+
+  domains: ["robotwin_aloha_bimanual"]
+  shared_obs_keys: ["front_img_1"]
+
+  shared_stem_specs:
+    front_img_1:
+      _target_: egowam.models.hpt_nets.MLPPolicyStem
+      input_dim: 256
+      output_dim: 256
+      widths: [256]
+      specs:
+        random_horizon_masking: false
+        cross_attn:
+          crossattn_latent: 16
+          crossattn_heads: 8
+          crossattn_dim_head: 64
+          crossattn_modality_dropout: 0.1
+          modality_embed_dim: 256
+
+  stem_specs:
+    robotwin_aloha_bimanual:
+      left_wrist_img:
+        _target_: egowam.models.hpt_nets.MLPPolicyStem
+        input_dim: 256
+        output_dim: 256
+        widths: [256]
+        specs:
+          random_horizon_masking: false
+          cross_attn:
+            crossattn_latent: 16
+            crossattn_heads: 8
+            crossattn_dim_head: 64
+            crossattn_modality_dropout: 0.1
+            modality_embed_dim: 256
+      right_wrist_img:
+        _target_: egowam.models.hpt_nets.MLPPolicyStem
+        input_dim: 256
+        output_dim: 256
+        widths: [256]
+        specs:
+          random_horizon_masking: false
+          cross_attn:
+            crossattn_latent: 16
+            crossattn_heads: 8
+            crossattn_dim_head: 64
+            crossattn_modality_dropout: 0.1
+            modality_embed_dim: 256
+      state_ee_pose:
+        _target_: egowam.models.hpt_nets.MLPPolicyStem
+        input_dim: 14
+        output_dim: 256
+        widths: [256]
+        specs:
+          random_horizon_masking: false
+          cross_attn:
+            crossattn_latent: 16
+            crossattn_heads: 8
+            crossattn_dim_head: 64
+            crossattn_modality_dropout: 0.1
+            modality_embed_dim: 256
+
+  head_specs:
+    robotwin_aloha_bimanual:
+      _target_: egowam.models.fm_policy.FMPolicy
+      prediction_type: "v_prediction"
+      action_horizon: 100
+      num_inference_steps: 50
+      pooling: null
+      time_dist: "beta"
+      infer_ac_dims:
+        robotwin_aloha_bimanual: 14
+      model:
+        _target_: egowam.models.denoising_nets.CrossTransformer
+        nblocks: 6
+        cond_dim: 256
+        hidden_dim: 128
+        act_dim: 14
+        act_seq: 100
+        n_heads: 4
+        dropout: 0.1
+        mlp_layers: 4
+        mlp_ratio: 4
+    robotwin_aloha_bimanual_future_ee_pose:
+      _target_: egowam.models.fm_policy.FMPolicy
+      prediction_type: "v_prediction"
+      action_horizon: 1
+      num_inference_steps: 50
+      pooling: null
+      time_dist: "beta"
+      infer_ac_dims:
+        robotwin_aloha_bimanual: 14
+      model:
+        _target_: egowam.models.denoising_nets.CrossTransformer
+        nblocks: 4
+        cond_dim: 256
+        hidden_dim: 128
+        act_dim: 14
+        act_seq: 1
+        n_heads: 4
+        dropout: 0.1
+        mlp_layers: 4
+        mlp_ratio: 4
+    robotwin_aloha_bimanual_future_image_latent:
+      _target_: egowam.models.fm_policy.FMPolicy
+      prediction_type: "v_prediction"
+      action_horizon: 1
+      num_inference_steps: 50
+      pooling: "mean"
+      time_dist: "beta"
+      infer_ac_dims:
+        robotwin_aloha_bimanual: 196608
+      model:
+        _target_: egowam.models.dit_image_decoder.DiTImageDecoder
+        lat_channels: 768
+        lat_h: 16
+        lat_w: 16
+        patch_size: 2
+        hidden_dim: 384
+        n_blocks: 6
+        n_heads: 6
+        mlp_ratio: 4.0
+        dropout: 0.0
+        obs_dim: 256
+        time_dim: 256
+
+  encoder_specs:
+    front_img_1:
+      _target_: egowam.models.hpt_nets.ResNet
+      output_dim: 256
+    right_wrist_img:
+      _target_: egowam.models.hpt_nets.ResNet
+      output_dim: 256
+    left_wrist_img:
+      _target_: egowam.models.hpt_nets.ResNet
+      output_dim: 256
+
+  train_image_augs:
+    _target_: torchvision.transforms.Compose
+    transforms:
+      - _target_: torchvision.transforms.ColorJitter
+        brightness: 0.1
+        contrast: 0.1
+        saturation: 0.1
+        hue: 0.05
+      - _target_: torchvision.transforms.Normalize
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+  eval_image_augs:
+    _target_: torchvision.transforms.Compose
+    transforms:
+      - _target_: torchvision.transforms.Normalize
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+
+optimizer:
+  _target_: torch.optim.AdamW
+  _partial_: true
+  lr: 1e-4
+  weight_decay: 0.0001
+
+scheduler:
+  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+  _partial_: true
+  T_max: 1400
+  eta_min: 1e-5

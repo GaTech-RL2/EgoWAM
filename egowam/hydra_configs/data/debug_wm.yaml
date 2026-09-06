@@ -1,0 +1,105 @@
+# Tiny world-model co-train split for smoke runs (trainer=debug).
+#
+# Mirrors cup_saucer/indomain_wm.yaml -- same tasks, filters and embodiments -- but takes a 1%
+# slice of each so a run reaches a training step in seconds. Drives the DINO (RAE) and Pixel
+# variants, which share the `_wm` data layout. Use it to exercise plumbing, never to judge a
+# number.
+
+_target_: egowam.pl_utils.pl_data_utils.MultiDataModuleWrapper
+
+train_datasets:
+  eva_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/eva_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+        action_horizon: 45
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+        chunk_length: 100
+        use_future: true
+    filters: 
+      task: "EgoWAM_cup_on_saucer"
+      scene: "white_wall"
+      robot_name: "eva_bimanual"
+    mode: percent
+    percent: 0.01
+
+  aria_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/aria_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+        action_horizon: 30
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+        chunk_length: 100
+        use_future: true
+    filters:
+      task: "EgoWAM_cup_on_saucer"
+      scene: "white_wall"
+      robot_name: "aria_bimanual"
+    mode: percent
+    percent: 0.01
+
+valid_datasets:
+  eva_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/eva_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+        action_horizon: 45
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+        chunk_length: 100
+        use_future: true
+    filters: 
+      task: "EgoWAM_cup_on_saucer"
+      scene: "white_wall"
+      robot_name: "eva_bimanual"
+    mode: valid
+    valid_ratio: 0.01
+  
+  aria_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/aria_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+        action_horizon: 30
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+        chunk_length: 100
+        use_future: true
+    filters:
+      task: "EgoWAM_cup_on_saucer"
+      scene: "white_wall"
+      robot_name: "aria_bimanual"
+    mode: valid
+    valid_ratio: 0.01
+
+train_dataloader_params:
+  eva_bimanual:
+    batch_size: 32
+    num_workers: 10
+  aria_bimanual:
+    batch_size: 32
+    num_workers: 10
+valid_dataloader_params:
+  eva_bimanual:
+    batch_size: 32
+    num_workers: 10
+  aria_bimanual:
+    batch_size: 32
+    num_workers: 10

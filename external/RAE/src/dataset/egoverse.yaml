@@ -1,0 +1,32 @@
+name: egoverse
+args: []
+kwargs: {}
+
+dataset:
+  _target_: "dataset.egoverse_dset.load_egoverse_slice_train_val"
+  data_path: /coc/flash7/mlin365/data/egoverse
+  normalize_action: False
+  valid_ratio: 0.1
+  transform:
+    _target_: "dataset.img_transforms.default_transform"
+    img_size: 256
+  include_dex_keypoints: False
+  include_head_pose: False
+  filter: put_cup_on_saucer_rl2_lab_scene_1_recording_1_processed
+  mode: train
+
+# dataset:
+#   _target_: "dataset.egoverse_dset.load_egoverse_slice_train_val"
+#   data_path: /coc/cedarp-dxu345-0/bli678/egoverse/processed_v1/put_cup_on_saucer
+#   normalize_action: False
+#   valid_ratio: 0.1
+#   transform:
+#     _target_: "dataset.img_transforms.default_transform"
+#     img_size: 256
+#   include_dex_keypoints: False
+#   include_head_pose: False
+#   filter: put_cup_on_saucer_rl2_lab_scene_1_recording_1_processed
+#   mode: train
+
+decoder_path: null
+num_workers: 16

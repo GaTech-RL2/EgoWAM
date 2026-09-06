@@ -1,0 +1,32 @@
+defaults:
+  - default
+
+# DDP with a long collective timeout.
+#
+# WHY: every rank computes the SAME normalization statistics independently before
+# training starts, and that pass is CPU-bound (Aria everse = 1.78M indices). On a
+# CPU-poor allocation the ranks finish minutes-to-tens-of-minutes apart, and the first
+# collective after the preflight is a barrier -- so the fastest rank sits in an ALLREDUCE
+# waiting for the slowest. NCCL's default timeout is 30 min, after which the watchdog
+# aborts the whole job:
+#
+#   [Rank 2] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=3,
+#   OpType=ALLREDUCE, NumelIn=1 ...) ran for 1800014 milliseconds before timing out
+#
+# That killed the everse arm 57 min into job 3663526 -- after the preflight had actually
+# succeeded. 4 h covers any preflight this repo produces; it does NOT mask a hang, it only
+# moves the deadline past legitimate startup skew.
+#
+# Otherwise identical to trainer/ddp.yaml (plain ddp, no find_unused_parameters).
+strategy:
+  _target_: lightning.pytorch.strategies.DDPStrategy
+  timeout:
+    _target_: datetime.timedelta
+    hours: 4
+
+accelerator: gpu
+devices: ${eval:'${launch_params.gpus_per_node} * ${launch_params.nodes}'}
+num_nodes: ${launch_params.nodes}
+sync_batchnorm: True
+check_val_every_n_epoch: 200
+num_sanity_val_steps: 0

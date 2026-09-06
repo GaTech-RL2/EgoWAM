@@ -1,0 +1,64 @@
+# RoboTwin aloha-agilex SINGLE-embodiment local zarr + 3D point-flow sidecars.
+# include_point_flow_3d=True turns on the Track4World point-flow loader path; the
+# flow sidecars live in a parallel dir tree (point_flow_root) keyed by the same
+# <task>/<robot>_<variant>/episodeN.zarr path as folder_path. Keep folder_path and
+# point_flow_root pointing at the SAME task/variant (override both per task).
+_target_: egowam.pl_utils.pl_data_utils.MultiDataModuleWrapper
+
+train_datasets:
+  robotwin_aloha_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.robotwin_root}/zarrDataset/pick_diverse_bottles/aloha-agilex_clean_50
+      key_map:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinAloha.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.robotwin_root}_3d_flow_track4world/pick_diverse_bottles/aloha-agilex_clean_50
+        # 0.0 keeps all points; raise to reject near-stationary background pts.
+        point_flow_movement_threshold_3d: 0.0
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinAloha.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+        # Must equal the preflight's `{train_datasets-key}.future_flow_3d_points`.
+        point_flow_stats_key_3d: robotwin_aloha_bimanual.future_flow_3d_points
+    mode: train
+
+valid_datasets:
+  robotwin_aloha_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.LocalEpisodeResolver
+      folder_path: ${paths.robotwin_root}/zarrDataset/pick_diverse_bottles/aloha-agilex_clean_50
+      key_map:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinAloha.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_root: ${paths.robotwin_root}_3d_flow_track4world/pick_diverse_bottles/aloha-agilex_clean_50
+        point_flow_movement_threshold_3d: 0.0
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.robotwin.RobotwinAloha.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_stats_key_3d: robotwin_aloha_bimanual.future_flow_3d_points
+    mode: valid
+
+train_dataloader_params:
+  robotwin_aloha_bimanual:
+    batch_size: 32
+    num_workers: 10
+
+valid_dataloader_params:
+  robotwin_aloha_bimanual:
+    batch_size: 32
+    num_workers: 10

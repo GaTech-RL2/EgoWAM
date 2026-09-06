@@ -1,0 +1,79 @@
+# Stage-1 (RAE decoder) training data: EVA robot + Aria human, images only.
+#
+# Deliberately NOT one of egowam/hydra_configs/data/*.yaml. The RAE script loads this with
+# OmegaConf directly, outside Hydra, so `${paths.data_root}` would not resolve -- there is
+# no paths group to interpolate against. Paths here go through `oc.env`, which OmegaConf
+# resolves on its own. Same episodes and filters as
+# hydra_configs/data/cup_saucer/indomain_wm.yaml.
+#
+# Only the image keys below are read; the action/proprio machinery in the key_map is
+# carried because the resolver needs a complete map, not because stage 1 uses it.
+
+pixel_key: observations.images.front_img_1
+future_pixel_key: future.observations.images.front_img_1
+
+train_datasets:
+  eva_bimanual:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/eva_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+        action_horizon: 45
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+        chunk_length: 100
+        use_future: true
+    filters:
+      task: "EgoWAM_cup_on_saucer"
+      scene: "white_wall"
+      robot_name: "eva_bimanual"
+
+  aria_bimanual:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+        action_horizon: 30
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+        chunk_length: 100
+        use_future: true
+    filters:
+      task: "EgoWAM_cup_on_saucer"
+      scene: "white_wall"
+      robot_name: "aria_bimanual"
+
+valid_datasets:
+  eva_bimanual:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/eva_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+        action_horizon: 45
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+        chunk_length: 100
+        use_future: true
+    filters:
+      task: "EgoWAM_cup_on_saucer"
+      scene: "white_wall"
+      robot_name: "eva_bimanual"
+
+  aria_bimanual:
+    resolver:
+      folder_path: ${oc.env:EGOWAM_DATA_ROOT,/coc/flash7/scratch/egowm/egoverseS3ZarrDataset}/aria_cup_saucer
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+        action_horizon: 30
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+        chunk_length: 100
+        use_future: true
+    filters:
+      task: "EgoWAM_cup_on_saucer"
+      scene: "white_wall"
+      robot_name: "aria_bimanual"

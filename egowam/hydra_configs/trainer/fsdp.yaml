@@ -1,0 +1,24 @@
+defaults:
+  - default
+
+# Memory-saving trainer for the official Wan VACE future-image head.
+# It shards the large Diffusers Wan transformer blocks across GPUs while keeping
+# the normal Trainer interface, so enable it with: trainer=fsdp.
+strategy:
+  _target_: lightning.pytorch.strategies.FSDPStrategy
+  sharding_strategy: FULL_SHARD
+  state_dict_type: sharded
+  use_orig_params: true
+  limit_all_gathers: true
+  cpu_offload: false
+  auto_wrap_policy:
+    _target_: egowam.utils.fsdp.build_transformer_auto_wrap_policy
+  activation_checkpointing_policy:
+    _target_: egowam.utils.fsdp.build_transformer_auto_wrap_policy
+
+accelerator: gpu
+devices: ${eval:'${launch_params.gpus_per_node} * ${launch_params.nodes}'}
+num_nodes: ${launch_params.nodes}
+sync_batchnorm: false
+check_val_every_n_epoch: 200
+num_sanity_val_steps: 0

@@ -1,0 +1,19 @@
+defaults:
+  - default
+
+# Plain DDP — Lightning previously emitted:
+#   "find_unused_parameters=True was specified in DDP constructor, but did
+#   not find any unused parameters in the forward pass. ... results in an
+#   extra traversal of the autograd graph every iteration."
+# Codex round-2 also flagged this. Switching to plain `ddp` removes that
+# extra graph traversal at no behavioral cost. Re-enable per-job by passing
+# `trainer.strategy=ddp_find_unused_parameters_true` if a future config
+# legitimately needs it.
+strategy: ddp
+
+accelerator: gpu
+devices: ${eval:'${launch_params.gpus_per_node} * ${launch_params.nodes}'}
+num_nodes: ${launch_params.nodes}
+sync_batchnorm: True
+check_val_every_n_epoch: 200
+num_sanity_val_steps: 0

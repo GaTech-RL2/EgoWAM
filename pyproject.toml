@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "egowam"
+version = "1.0.0"
+description = "EgoWAM: World Action Models Beyond Pixels with In-the-Wild Egocentric Human Data"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "Baoyu Li" }, { name = "Xinchen Yin" }]
+keywords = ["world-action-models", "robot-manipulation", "egocentric", "imitation-learning"]
+
+# Pinned to what the released environment actually runs. Regenerated from the working env rather
+# than carried over from the old requirements.txt, whose pins had drifted (numpy 1.26.4 pinned
+# against 2.4.3 installed, diffusers 0.38.0 against 0.37.0, opencv 4.7 against 4.13).
+dependencies = [
+  "torch==2.5.1",
+  "torchvision==0.20.1",
+  "lightning",
+  "hydra-core",
+  "hydra-submitit-launcher==1.2.0",
+  "submitit",
+  "zarr==3.1.5",
+  "transformers==4.57.3",
+  "diffusers==0.38.0",
+  "timm",
+  "einops",
+  "positional-encodings[pytorch]",
+  "pytorch-kinematics",
+  "arm_pytorch_utilities",
+  "mink==0.0.13",
+  "mujoco==3.4.0",
+  "dm-control==1.0.8",
+  "projectaria-tools[all]==2.0.0",
+  "numpy",
+  "scipy",
+  "pandas",
+  "pyarrow",
+  "opencv-python",
+  "av==12.0.0",
+  "simplejpeg",
+  "mediapy",
+  "matplotlib",
+  "wandb",
+  "boto3",
+  "cloudpathlib",
+  "s5cmd",
+  "sqlalchemy",
+  "psycopg[binary]",
+  "datasets==4.0.0",
+  "loguru>=0.7.3",
+  "termcolor",
+  "rich",
+  "tabulate",
+  "prettytable",
+  "overrides",
+  "pyquaternion",
+  "pyyaml",
+  "typing_extensions",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pre-commit", "ruff"]
+# RAE stage-1 decoder training (egowam/scripts/rae_process). external/RAE imports
+# torch-fidelity at module scope through its eval package, so training needs it even
+# though stage 1 never computes FID.
+rae = ["torch-fidelity"]
+
+[project.urls]
+Homepage = "https://gatech-rl2.github.io/egowam.github.io"
+
+[tool.setuptools.packages.find]
+include = ["egowam*"]

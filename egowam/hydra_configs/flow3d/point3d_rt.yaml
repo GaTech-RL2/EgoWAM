@@ -1,0 +1,73 @@
+# @package data_schematic.schematic_dict
+#
+# Track4World point-flow targets for the RoboTwin embodiments. Selected with
+# flow3d=point3d_rt on train_zarr_wm_robotwin. Separate from flow3d/point3d.yaml because that
+# one keys eva_bimanual / aria_bimanual; these key robotwin_*_bimanual.
+#
+# Kept out of the base schematic because a flow key on a dataset with no
+# point_flow_root raises KeyError (zarr_dataset_multi.py:1103).
+robotwin_aloha_bimanual:
+  future_flow_3d_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points
+  future_flow_3d_points__current_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__current_points
+  future_flow_3d_points__validity_mask:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__validity_mask
+  future_flow_3d_points__sampled_uv:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__sampled_uv
+robotwin_arx_bimanual:
+  future_flow_3d_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points
+  future_flow_3d_points__current_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__current_points
+  future_flow_3d_points__validity_mask:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__validity_mask
+  future_flow_3d_points__sampled_uv:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__sampled_uv
+robotwin_piper_bimanual:
+  future_flow_3d_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points
+  future_flow_3d_points__current_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__current_points
+  future_flow_3d_points__validity_mask:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__validity_mask
+  future_flow_3d_points__sampled_uv:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__sampled_uv
+robotwin_ur5_bimanual:
+  future_flow_3d_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points
+  future_flow_3d_points__current_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__current_points
+  future_flow_3d_points__validity_mask:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__validity_mask
+  future_flow_3d_points__sampled_uv:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__sampled_uv
+robotwin_franka_bimanual:
+  future_flow_3d_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points
+  future_flow_3d_points__current_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__current_points
+  future_flow_3d_points__validity_mask:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__validity_mask
+  future_flow_3d_points__sampled_uv:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__sampled_uv

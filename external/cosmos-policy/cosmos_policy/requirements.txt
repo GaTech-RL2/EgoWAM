@@ -1,0 +1,49 @@
+# Cosmos Policy Requirements
+#
+# Note: This file lists the core dependencies. For GPU-accelerated packages
+# (torch, flash-attn, xformers, etc.), please refer to SETUP.md for installation
+# instructions specific to your CUDA version.
+#
+# For a complete installation using uv, use the pyproject.toml file instead:
+#   uv pip install -e ".[cu128]"  # for CUDA 12.8
+# or
+#   uv pip install -e ".[cu130]"  # for CUDA 13.0
+
+# Core Cosmos dependencies
+cosmos-predict2>=0.1.0
+
+# Core Python libraries
+attrs>=25.4.0
+numpy>=2.0.0
+pillow>=11.3.0
+
+# Deep learning frameworks (install separately for your CUDA version)
+# torch>=2.7.0
+# torchvision
+
+# Data processing and I/O
+h5py>=3.0.0
+imageio>=2.37.0
+opencv-python>=4.11.0.86
+av>=16.0.1
+einops>=0.8.1
+
+# Configuration and utilities
+omegaconf>=2.3.0
+hydra-core>=1.3.2
+draccus>=0.9.0
+loguru>=0.7.3
+tqdm>=4.67.1
+pyyaml>=6.0.3
+
+# Experiment tracking
+wandb>=0.22.2
+
+# API server dependencies (optional, for deployment)
+fastapi>=0.115.0
+uvicorn>=0.34.0
+json-numpy>=1.2.0
+
+# Text embeddings
+transformers>=4.51.3
+sentencepiece>=0.2.1

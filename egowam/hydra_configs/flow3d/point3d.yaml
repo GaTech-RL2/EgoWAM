@@ -1,0 +1,35 @@
+# @package data_schematic.schematic_dict
+#
+# Flow-target keys for the WM data schematic. Selected by `flow3d=` on the CLI so that a
+# single train_zarr_wm entrypoint covers every world target; the keys cannot simply be
+# declared unconditionally because a flow key on a dataset with no point_flow_root
+# raises KeyError (zarr_dataset_multi.py:1103).
+#
+# Track4World point-flow targets (3D plus the projected-2D companions the loader
+# publishes alongside them). Used by the 3D-Flow variant.
+eva_bimanual:
+  future_flow_3d_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points
+  future_flow_3d_points__current_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__current_points
+  future_flow_3d_points__validity_mask:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__validity_mask
+  future_flow_3d_points__sampled_uv:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__sampled_uv
+aria_bimanual:
+  future_flow_3d_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points
+  future_flow_3d_points__current_points:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__current_points
+  future_flow_3d_points__validity_mask:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__validity_mask
+  future_flow_3d_points__sampled_uv:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__sampled_uv

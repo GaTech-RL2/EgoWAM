@@ -1,0 +1,3 @@
+export WANDB_KEY="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"
+export ENTITY="cassie"
+export PROJECT="egowm"

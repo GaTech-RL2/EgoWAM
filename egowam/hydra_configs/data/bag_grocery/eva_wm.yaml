@@ -1,0 +1,51 @@
+_target_: egowam.pl_utils.pl_data_utils.MultiDataModuleWrapper
+
+train_datasets:
+  eva_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/eva_bag_groceries
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+        action_horizon: 45
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+        chunk_length: 100
+        use_future: true
+    filters:
+      task: "EgoWAM_bag_groceries"
+      scene: "white_wall"
+      robot_name: "eva_bimanual"
+    mode: train
+
+valid_datasets:
+  eva_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/eva_bag_groceries
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+        action_horizon: 45
+        use_future: true
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+        chunk_length: 100
+        use_future: true
+    filters:
+      task: "EgoWAM_bag_groceries"
+      scene: "white_wall"
+      robot_name: "eva_bimanual"
+    mode: valid
+
+train_dataloader_params:
+  eva_bimanual:
+    batch_size: 32
+    num_workers: 10
+
+valid_dataloader_params:
+  eva_bimanual:
+    batch_size: 32
+    num_workers: 10

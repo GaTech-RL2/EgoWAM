@@ -1,0 +1,17 @@
+name: rae
+channels:
+  - pytorch
+  - nvidia
+dependencies:
+  - python == 3.10
+  - pytorch == 2.6.0
+  - torchvision == 0.21.0
+  - pytorch-cuda == 12.1
+  - pip
+  - pip:
+    - timm == 0.9.16
+    - accelerate == 0.23.0
+    - torchdiffeq == 0.2.5
+    - wandb
+    - transformers
+    - einops

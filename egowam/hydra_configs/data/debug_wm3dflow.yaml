@@ -1,0 +1,131 @@
+# Tiny 3D-flow co-train split for smoke runs (trainer=debug).
+#
+# Mirrors cup_saucer/indomain_wm3dflow.yaml -- same tasks, filters, embodiments and flow
+# sidecars -- but takes a 1% slice of each so a run reaches a training step in seconds.
+# cup_saucer is used rather than fold_clothes because it is the only task with BOTH eva and
+# aria Track4World sidecars. Use it to exercise plumbing, never to judge a number.
+
+_target_: egowam.pl_utils.pl_data_utils.MultiDataModuleWrapper
+
+train_datasets:
+  eva_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/eva_cup_saucer
+      flow_root: ${paths.data_root}/eva_cup_saucer_1_3d_flow_track4world
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        # Data-driven from analyze_point_flow_thresholds (P25 ~ 2.4 mm).
+        point_flow_movement_threshold_3d: 0.002  # meters (EVA world-frame)
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+    filters:
+      task: "EgoWAM_cup_on_saucer"
+      scene: "white_wall"
+      robot_name: "eva_bimanual"
+    mode: percent
+    percent: 0.01
+
+  aria_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/aria_cup_saucer
+      flow_root: ${paths.data_root}/aria_cup_saucer_3d_flow_track4world
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+        action_horizon: 30
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_head_skip_frames: 20
+        point_flow_tail_skip_frames: 20
+        point_flow_movement_threshold_3d: 0.010  # meters
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+    filters:
+      task: "EgoWAM_cup_on_saucer"
+      scene: "white_wall"
+      robot_name: "aria_bimanual"
+    mode: percent
+    percent: 0.01
+
+valid_datasets:
+  eva_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/eva_cup_saucer
+      flow_root: ${paths.data_root}/eva_cup_saucer_1_3d_flow_track4world
+      key_map:
+        _target_: egowam.rldb.embodiment.eva.Eva.get_keymap
+        action_horizon: 45
+        use_future: true
+        include_point_flow_3d: true
+        # Data-driven from analyze_point_flow_thresholds (P25 ~ 2.4 mm).
+        point_flow_movement_threshold_3d: 0.002  # meters (EVA world-frame)
+        point_flow_head_skip_frames: 0
+        point_flow_tail_skip_frames: 0
+      transform_list:
+        _target_: egowam.rldb.embodiment.eva._build_eva_bimanual_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+    filters:
+      task: "EgoWAM_cup_on_saucer"
+      scene: "white_wall"
+      robot_name: "eva_bimanual"
+    mode: valid
+    valid_ratio: 0.01
+
+  aria_bimanual:
+    _target_: egowam.rldb.zarr.zarr_dataset_multi.MultiDataset._from_resolver
+    resolver:
+      _target_: egowam.rldb.zarr.zarr_dataset_multi.S3EpisodeResolver
+      folder_path: ${paths.data_root}/aria_cup_saucer
+      flow_root: ${paths.data_root}/aria_cup_saucer_3d_flow_track4world
+      key_map:
+        _target_: egowam.rldb.embodiment.human.Aria.get_keymap
+        action_horizon: 30
+        use_future: true
+        include_point_flow_3d: true
+        point_flow_head_skip_frames: 20
+        point_flow_tail_skip_frames: 20
+        point_flow_movement_threshold_3d: 0.010  # meters
+      transform_list:
+        _target_: egowam.rldb.embodiment.human.Aria.get_transform_list
+        chunk_length: 100
+        use_future: true
+        include_point_flow_3d: true
+    filters:
+      task: "EgoWAM_cup_on_saucer"
+      scene: "white_wall"
+      robot_name: "aria_bimanual"
+    mode: valid
+    valid_ratio: 0.01
+
+train_dataloader_params:
+  eva_bimanual:
+    batch_size: 32
+    num_workers: 4
+  aria_bimanual:
+    batch_size: 32
+    num_workers: 4
+valid_dataloader_params:
+  eva_bimanual:
+    batch_size: 32
+    num_workers: 4
+  aria_bimanual:
+    batch_size: 32
+    num_workers: 4
