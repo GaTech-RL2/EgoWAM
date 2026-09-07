@@ -47,7 +47,7 @@ rather than editing configs:
 | `EGOWAM_RAE_ROOT`, `EGOWAM_RAE_CKPT_ROOT` | RAE assets for the DINO target |
 | `EGOWAM_ROBOTWIN_ROOT` | RoboTwin sim scratch |
 | `EGOWAM_ROBOTWIN_FLOW_ROOT` | RoboTwin 3D-flow sidecars (sibling tree to the dataset root) |
-| `HF_HOME` | HuggingFace cache (Pixel variant only) |
+| `HF_HOME` | HuggingFace cache — the Pixel and DINO variants both pull weights from the Hub |
 | `WANDB_ENTITY`, `WANDB_PROJECT` | logging destination |
 
 ## Gated and third-party assets
@@ -71,18 +71,56 @@ preflight, a missing-access run fails with `GatedRepoError: 401` more than an ho
 
 ### RAE checkpoints — DINO variant
 
-The DINO target decodes into RAE latent space and needs a stage-1 decoder checkpoint. Published
-weights are on the Hub, so this no longer requires training your own:
+The DINO target decodes into RAE latent space, which takes **two** sets of weights: our fine-tuned
+stage-1 decoder, and the upstream RAE assets its config loads around it. Neither is vendored —
+RAE's own `.gitignore` covers `models/`.
+
+**1. Our stage-1 decoder.** Published on the Hub, so this no longer requires training your own:
 
 ```bash
 hf download boeyyyy/EgoWAM-checkpoints rae_stage1/ep-0000002.pt --local-dir ./ckpts
-
-export EGOWAM_RAE_ROOT=external/RAE                  # the vendored code
-export EGOWAM_RAE_CKPT_ROOT=./ckpts/rae_stage1       # the downloaded decoder
 ```
 
-To train your own instead, see [training.md](training.md#rae-stage-1-optional) — a multi-day run:
-the full mixture is ~5.06M samples at ~158k steps/epoch.
+**2. Upstream RAE assets.** `hpt_wm_{eva,cotrain}_rae.yaml` point at RAE's own
+`configs/stage2/sampling/ImageNet256/DiTDHXL-DINOv2-B.yaml`, and that config names three files by
+path *relative to the RAE root* — so they must land under `$EGOWAM_RAE_ROOT/models/`:
+
+```bash
+hf download nyu-visionx/RAE-collections \
+  decoders/dinov2/wReg_base/ViTXL_n08/model.pt \
+  stats/dinov2/wReg_base/imagenet1k/stat.pt \
+  DiTs/Dinov2/wReg_base/ImageNet256/DiTDH-XL/stage2_model.pt \
+  --local-dir external/RAE/models
+```
+
+| File | Size | Why it is needed |
+|---|---|---|
+| `decoders/.../ViTXL_n08/model.pt` | 1.6 GB | `pretrained_decoder_path` — read when the stage-1 model is constructed. Our checkpoint then overwrites every decoder weight (`strict=True`), so the values do not survive, but the file must exist or construction raises. |
+| `stats/.../imagenet1k/stat.pt` | 803 KB | `normalization_stat_path` — the *only* thing that sets `do_normalization=True`. Without it latents are left unnormalized and the world-model targets change scale, so this small file is load-bearing, not optional. |
+| `DiTs/.../DiTDH-XL/stage2_model.pt` | 3.2 GB | Our configs set `use_stage2_features: true`, so the stage-2 DiT is built and its `ckpt` loaded. |
+
+Omit the file list to fetch the whole collection (`--local-dir external/RAE/models` alone); the
+extra decoders and DiTs are for encoders this repo does not use.
+
+**3. The DINOv2 encoder** (`facebook/dinov2-with-registers-base`) is pulled from the Hub
+automatically by `from_pretrained` — weights, config and image processor. It is public and needs no
+access request, but the download happens at model-build time, so on an offline compute node warm
+`HF_HOME` first.
+
+Then point both roots at what you downloaded:
+
+```bash
+export EGOWAM_RAE_ROOT=external/RAE                  # vendored code + models/ from step 2
+export EGOWAM_RAE_CKPT_ROOT=./ckpts/rae_stage1       # the stage-1 decoder from step 1
+```
+
+Set `EGOWAM_RAE_ROOT` explicitly: its default in `paths/default.yaml` is an internal cluster path,
+and leaving it unset sends every one of the relative lookups above somewhere you cannot read.
+
+Training your own stage-1 decoder needs one more file — the GAN discriminator's DINO ViT-S/8
+backbone, also in this collection as `discs/dino_vit_small_patch8_224.pth` (83 MB). See
+[training.md](training.md#rae-stage-1-optional) — a multi-day run: the full mixture is ~5.06M
+samples at ~158k steps/epoch.
 
 ## Optional stacks
 
