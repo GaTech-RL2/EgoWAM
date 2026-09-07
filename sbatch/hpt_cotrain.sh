@@ -51,6 +51,7 @@ python egowam/trainHydra.py \
     --config-name=train_zarr.yaml \
     data=${TASK}/${REGIME} \
     model=hpt_bc_cotrain \
+    trainer.strategy=ddp_find_unused_parameters_true \
     logger.wandb.project=${WANDB_PROJECT:-egowam} \
     name=${TASK} \
     description=${DESC} \

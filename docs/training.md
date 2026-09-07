@@ -19,6 +19,7 @@ prediction target. On SLURM, one launcher per method covers every task and regim
 sbatch sbatch/hpt_eva.sh       <task>            # BC, robot only
 sbatch sbatch/hpt_cotrain.sh   <task> [regime]   # BC + human
 sbatch sbatch/hpt_wm_vae.sh    <task> [regime]   # Pixel
+sbatch sbatch/hpt_wm_pixelpt.sh <task> [regime]  # Pixel-PT (2 GPUs)
 sbatch sbatch/hpt_wm_rae.sh    <task> [regime]   # DINO
 sbatch sbatch/hpt_wm_3dflow.sh <task> [regime]   # 3D Flow
 
@@ -42,8 +43,11 @@ Which variant needs which third-party asset is in
 
 ```bash
 # BC co-training
+# hpt_bc_cotrain leaves some parameters out of the loss, which the plain `ddp` strategy in
+# trainer/ddp.yaml rejects. Robot-only BC is unaffected.
 python egowam/trainHydra.py --config-name=train_zarr.yaml \
   data=cup_saucer/everseA model=hpt_bc_cotrain \
+  trainer.strategy=ddp_find_unused_parameters_true \
   name=cup_saucer description=bc_flagship
 
 # Pixel co-training
@@ -51,19 +55,19 @@ python egowam/trainHydra.py --config-name=train_zarr_wm.yaml \
   data=cup_saucer/everseA_wm model=hpt_wm_cotrain \
   name=cup_saucer description=pixel_flagship
 
+# Pixel-PT co-training -- same target as Pixel, but the head starts from Wan2.1 video
+# weights. Needs TWO GPUs: the 1.42B head's weights, grads and Adam moments are ~21 GiB
+# before activations. Halve the per-GPU batch so the global batch stays 32.
+python egowam/trainHydra.py --config-name=train_zarr_wm.yaml \
+  trainer=ddp_long launch_params.gpus_per_node=2 \
+  data=cup_saucer/everseA_wm model=hpt_wm_cotrain_pixelpt \
+  data.train_dataloader_params.eva_bimanual.batch_size=16 \
+  data.train_dataloader_params.aria_bimanual.batch_size=16 \
+  name=cup_saucer description=pixelpt_flagship
+
 # DINO (RAE) co-training
-# The model config declares future_ee_pose and future_flow alongside future_image_latent, but the
-# `_wm` data split publishes only the latent -- so the auxiliary keys must be narrowed, exactly as
-# sbatch/hpt_wm_rae.sh does. Without these two overrides the run dies with
-# `KeyError: Missing key eva_bimanual_future_ee_pose`.
 python egowam/trainHydra.py --config-name=train_zarr_wm.yaml \
   data=cup_saucer/everseA_wm model=hpt_wm_cotrain_rae \
-  model.robomimic_model.wm_prediction_mode=joint \
-  model.robomimic_model.training_stage=3 \
-  'model.robomimic_model.auxiliary_ac_keys.eva_bimanual=[future_image_latent]' \
-  'model.robomimic_model.auxiliary_ac_keys.aria_bimanual=[future_image_latent]' \
-  model.robomimic_model.auxiliary_loss_weights.future_ee_pose=0.0 \
-  model.robomimic_model.auxiliary_loss_weights.future_flow=0.0 \
   name=cup_saucer description=dino_flagship
 
 # 3D flow co-training
@@ -232,6 +236,7 @@ that matter per variant:
 |---|---|---|
 | BC | `actions_cartesian_paired_mse_avg` | — |
 | Pixel | `actions_cartesian_paired_mse_avg` | `future_image_latent_pixel_mse_front` |
+| Pixel-PT | `actions_cartesian_paired_mse_avg` | `future_image_latent_pixel_mse_front` |
 | DINO | `actions_cartesian_paired_mse_avg` | `future_image_latent_latent_mse_front` |
 | 3D Flow | `actions_cartesian_paired_mse_avg` | `future_flow_3d_points_paired_mse_avg` |
 

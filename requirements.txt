@@ -37,6 +37,10 @@ zarr==3.1.5
 tabulate
 transformers==4.57.3
 diffusers==0.38.0
+huggingface_hub
+accelerate
+safetensors
+multi-storage-client
 timm
 boto3
 cloudpathlib

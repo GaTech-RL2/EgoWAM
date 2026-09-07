@@ -47,7 +47,7 @@ rather than editing configs:
 | `EGOWAM_RAE_ROOT`, `EGOWAM_RAE_CKPT_ROOT` | RAE assets for the DINO target |
 | `EGOWAM_ROBOTWIN_ROOT` | RoboTwin sim scratch |
 | `EGOWAM_ROBOTWIN_FLOW_ROOT` | RoboTwin 3D-flow sidecars (sibling tree to the dataset root) |
-| `HF_HOME` | HuggingFace cache — the Pixel and DINO variants both pull weights from the Hub |
+| `HF_HOME` | HuggingFace cache — the Pixel, Pixel-PT and DINO variants all pull weights from the Hub |
 | `WANDB_ENTITY`, `WANDB_PROJECT` | logging destination |
 
 ## Gated and third-party assets
@@ -68,6 +68,27 @@ python egowam/scripts/check_gated_assets.py     # ~2s, exits non-zero if unreach
 `sbatch/hpt_wm_vae.sh` and `sbatch/robotwin/train_rt.sh vae` run this preflight automatically. It
 matters because the VAE is only built *after* the data sync and normalization pass — without the
 preflight, a missing-access run fails with `GatedRepoError: 401` more than an hour in.
+
+### Wan2.1 video weights — Pixel-PT variant
+
+Pixel-PT initializes its future-image head from Wan2.1. Both repos are **public**, so there is no
+access request and no preflight — but the pull is several GB, and on clusters that police login-node
+processes it is worth fetching from a compute node first:
+
+```bash
+export HF_HOME=/path/to/shared/cache   # must be visible from compute nodes
+python - <<'EOF'
+from huggingface_hub import snapshot_download, hf_hub_download
+snapshot_download(repo_id="Wan-AI/Wan2.1-T2V-1.3B",
+                  allow_patterns=["diffusion_pytorch_model*", "**/diffusion_pytorch_model*",
+                                  "config.json", "**/config.json", "model_index.json", "**/*.json"],
+                  ignore_patterns=["*t5*", "*umt5*"])
+hf_hub_download(repo_id="Wan-AI/Wan2.1-VACE-1.3B", filename="Wan2.1_VAE.pth")
+EOF
+```
+
+The text encoders are excluded deliberately — the config sets `no_text_conditioning: true`. The head
+itself comes from `diffusers` (already pinned in `requirements.txt`), not from a separate checkout.
 
 ### RAE checkpoints — DINO variant
 

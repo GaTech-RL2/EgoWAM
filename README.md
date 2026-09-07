@@ -65,6 +65,7 @@ All variants share the trunk and the flow-matching action head, and differ only 
 |---|---|---|---|---|
 | **BC** | none (action only) | `model/hpt_bc_eva` | `model/hpt_bc_cotrain` | `hpt_eva.sh`, `hpt_cotrain.sh` |
 | **Pixel** | Wan VAE latent of the future frame | `model/hpt_wm_eva` | `model/hpt_wm_cotrain` | `hpt_wm_vae.sh` |
+| **Pixel-PT** | same target, head pretrained on Wan2.1 video | `model/hpt_wm_eva_pixelpt` | `model/hpt_wm_cotrain_pixelpt` | `hpt_wm_pixelpt.sh` |
 | **DINO** | DINOv2 patch features, RAE wide-DDT head | `model/hpt_wm_eva_rae` | `model/hpt_wm_cotrain_rae` | `hpt_wm_rae.sh` |
 | **3D Flow** | camera-stabilized dense 3D motion field | `model/hpt_wm_eva_3dflow` | `model/hpt_wm_cotrain_3dflow` | `hpt_wm_3dflow.sh` |
 

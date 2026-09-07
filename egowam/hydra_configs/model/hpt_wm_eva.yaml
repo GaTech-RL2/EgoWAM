@@ -15,11 +15,11 @@ robomimic_model:
     eva_bimanual: "actions_cartesian"
 
   auxiliary_ac_keys:
-    eva_bimanual: ["future_ee_pose", "future_image_latent", "future_flow"]
+    eva_bimanual: ["future_image_latent"]
   auxiliary_loss_weights:
-    future_ee_pose: 1.0
+    future_ee_pose: 0.0
     future_image_latent: 1.0
-    future_flow: 1.0
+    future_flow: 0.0
   future_proprio_key: "future_ee_pose"
   future_image_keys: ["future_front_img_1"]
   future_image_latent_key: "future_image_latent"
