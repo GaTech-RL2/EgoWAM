@@ -30,6 +30,7 @@ OVR="${HERE}/overlay/track4world"
 
 # --- egoverse overlay (tracked here) -> submodule package -------------------
 ln -sfnT "${OVR}/data"     "${T4W}/track4world/data"
+ln -sfnT "${OVR}/pipeline" "${T4W}/track4world/pipeline"
 ln -sf   "${OVR}/utils/flow_vis.py" "${T4W}/track4world/utils/flow_vis.py"
 
 # entry compute scripts resolve as scripts/compute_*.py from the submodule CWD
