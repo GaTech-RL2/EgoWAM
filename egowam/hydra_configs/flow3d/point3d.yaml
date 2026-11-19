@@ -20,6 +20,9 @@ eva_bimanual:
   future_flow_3d_points__sampled_uv:
     key_type: flow_keys
     zarr_key: future_flow_3d_points__sampled_uv
+  future_flow_3d_points__image_hw:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__image_hw
 aria_bimanual:
   future_flow_3d_points:
     key_type: flow_keys
@@ -33,3 +36,6 @@ aria_bimanual:
   future_flow_3d_points__sampled_uv:
     key_type: flow_keys
     zarr_key: future_flow_3d_points__sampled_uv
+  future_flow_3d_points__image_hw:
+    key_type: flow_keys
+    zarr_key: future_flow_3d_points__image_hw

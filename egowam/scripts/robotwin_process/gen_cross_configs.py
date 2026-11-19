@@ -420,11 +420,17 @@ def build_data(task, flow=False, data_variant="clean"):
 
 
 def _flow_schematic_keys():
-    # The 4 Track4World point-flow sidecar keys (flow_keys bypass quantile norm;
+    # The 5 Track4World point-flow sidecar keys (flow_keys bypass quantile norm;
     # NormalizeFlowDelta handles them). Names match _load_point_flow_target output.
     keys = {}
     base = "future_flow_3d_points"
-    for suffix in ("", "__current_points", "__validity_mask", "__sampled_uv"):
+    for suffix in (
+        "",
+        "__current_points",
+        "__validity_mask",
+        "__sampled_uv",
+        "__image_hw",
+    ):
         keys[base + suffix] = {"key_type": "flow_keys", "zarr_key": base + suffix}
     return keys
 

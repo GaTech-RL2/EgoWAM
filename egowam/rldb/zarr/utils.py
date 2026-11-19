@@ -43,10 +43,12 @@ FLOW_KEY_NAMES = frozenset(
         "future_flow_3d_points__current_points",
         "future_flow_3d_points__validity_mask",
         "future_flow_3d_points__sampled_uv",
+        "future_flow_3d_points__image_hw",
         "future_flow_2d_points",
         "future_flow_2d_points__current_points",
         "future_flow_2d_points__validity_mask",
         "future_flow_2d_points__sampled_uv",
+        "future_flow_2d_points__image_hw",
     }
 )
 

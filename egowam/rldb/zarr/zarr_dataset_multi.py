@@ -39,6 +39,7 @@ import zarr
 # from action_chunk_transforms import Transform
 from egowam.rldb.embodiment.embodiment import EMBODIMENT
 from egowam.rldb.zarr.point_flow_loader import (
+    POINT_FLOW_2D_IMAGE_SHAPE,
     POINT_FLOW_SOURCE,
     PointFlowIndex,
     build_2d_endpoint_trajectory,
@@ -1652,6 +1653,8 @@ class ZarrDataset(torch.utils.data.Dataset):
           - "trajectory":     (k_raw, N, D) float32   (native-k, every anchor)
           - "current_points": (N, D) float32          (= trajectory[0])
           - "validity_mask":  (N,) bool               (True = finite P_t / P_tk)
+          - "sampled_uv":     (N, 2) int64            static pixel anchors
+          - "image_hw":       (2,) int64              flow image (H, W)
           - "frame_skip":     int scalar (for reference)
 
         __getitem__ unpacks this into parallel batch keys "{k}",
@@ -1705,11 +1708,20 @@ class ZarrDataset(torch.utils.data.Dataset):
                 f"sampled_uv must be (N, 2), got {sampled_uv.shape} in {episode.episode_dir}"
             )
 
+        # (H, W) of the image the flow was computed on
+        image_hw = np.asarray(
+            episode.image_hw
+            if episode.image_hw is not None
+            else POINT_FLOW_2D_IMAGE_SHAPE,
+            dtype=np.int64,
+        )
+
         return {
             "trajectory": traj,
             "current_points": traj[0].copy(),
             "validity_mask": validity,
             "sampled_uv": sampled_uv.astype(np.int64, copy=False),
+            "image_hw": image_hw,
             "frame_skip": int(episode.frame_skip),
         }
 
@@ -1866,6 +1878,7 @@ class ZarrDataset(torch.utils.data.Dataset):
                 data[f"{k}__current_points"] = pf["current_points"]
                 data[f"{k}__validity_mask"] = pf["validity_mask"]
                 data[f"{k}__sampled_uv"] = pf["sampled_uv"]
+                data[f"{k}__image_hw"] = pf["image_hw"]
                 continue
 
             future_offset = spec.get("future_offset", 0)
@@ -1932,6 +1945,7 @@ class ZarrDataset(torch.utils.data.Dataset):
                 out[f"{k}__current_points"] = pf["current_points"]
                 out[f"{k}__validity_mask"] = pf["validity_mask"]
                 out[f"{k}__sampled_uv"] = pf["sampled_uv"]
+                out[f"{k}__image_hw"] = pf["image_hw"]
                 continue
 
             interval = self._resolve_bounded_read_interval(
